@@ -23,19 +23,21 @@ const listarMetas = async () => {
         }))
     })
 
+    metas.forEach(meta => {
+        meta.checked = respostas.includes(meta.value)
+    })
+
     if (respostas.length === 0) {
         console.log('nenhuma meta foi selecionada :(')
         return
     }
 
-    metas.forEach(meta => {
-        meta.checked = respostas.includes(meta.value)
-    })
+    
 
     console.log('metas concluídas:', metas)
 }
 
-const metasRealizadas = async () => {
+const metasConcluidas = async () => {
     const concluídas = metas.filter((meta) => {
         return meta.checked
     })
@@ -46,7 +48,7 @@ const metasRealizadas = async () => {
     }
 
     await select({
-        message: "metas realizadas",
+        message: "metas concluídas",
         choices:[...concluídas]
     })
 }
@@ -84,7 +86,7 @@ const start = async () => {
                 await listarMetas()
                 break
             case "concluídas":
-                await metasRealizadas()
+                await metasConcluidas()
                 break
             case "sair":
                 console.log("até a próxima!")
