@@ -1,49 +1,64 @@
-const { select, input } = require('@inquirer/prompts')
+const { select, input, checkbox } = require('@inquirer/prompts')
 
-// Inicialize `metas` como um array vazio
 let metas = []
 
 const cadastrarMeta = async () => {
-    // Corrigido: Use o nome da variável `meta` na função sem conflito
     const novaMeta = await input({ message: "insira a sua meta aqui: " })
 
-    if (novaMeta.length === 0) {  // Corrigido: Use `===` para comparação
+    if (novaMeta.length === 0) {
         console.log('este campo não pode estar vazio!')
         return
     }
 
-    metas.push(
-        { value: novaMeta, checked: false }
-    )
+    metas.push({ value: novaMeta, checked: false })
+}
+
+const listarMetas = async () => {
+    const respostas = await checkbox({
+        message: "selecione as suas metas concluídas: ",
+        choices: metas.map(meta => ({
+            name: meta.value,
+            value: meta.value,
+            checked: meta.checked
+        }))
+    })
+
+    if (respostas.length === 0) {
+        console.log('nenhuma meta foi selecionada :(')
+        return
+    }
+
+    metas.forEach(meta => {
+        meta.checked = respostas.includes(meta.value)
+    })
+
+    console.log('metas concluídas:', metas)
 }
 
 const start = async () => {
     while (true) {
         const opcao = await select({
-            message: "menu",
+            message: "Menu",
             choices: [
-                {
-                    name: "inserir metas",
-                    value: "inserir"
-                },
-                {
-                    name: "adicionar metas",
-                    value: "adicionar"
-                },
-                {
-                    name: "sair",
-                    value: "sair"
-                }
+                { 
+                    name: "inserir metas", 
+                    value: "inserir" },
+                { 
+                    name: "adicionar metas", 
+                    value: "adicionar" },
+                { 
+                    name: "sair", 
+                    value: "sair" }
             ]
         })
 
         switch (opcao) {
             case "inserir":
-                await cadastrarMeta()
-                console.log(metas)
+                await cadastrarMeta();
+                console.log('metas atuais:', metas)
                 break
             case "adicionar":
-                console.log("adicionar metas")
+                await listarMetas()
                 break
             case "sair":
                 console.log("até a próxima!")
@@ -51,6 +66,5 @@ const start = async () => {
         }
     }
 }
-
 
 start()
