@@ -53,6 +53,43 @@ const metasConcluidas = async () => {
     })
 }
 
+const metasAndamento = async () => {
+    const andamento = metas.filter((meta) => {
+        return meta.checked != true
+    })
+
+    if(andamento.length === 0){
+        console.log('não existem metas em andamento :)')
+        return
+    }
+
+    await select({
+        message: "metas em andamento: " + andamento.length,
+        choices: [...andamento]
+    })
+}
+
+const metasDeletadas = async () => {
+    const itensParaDeletar = await checkbox({
+        message: "Selecione uma meta para deletar: ",
+        choices: metas.map(meta => ({
+            name: meta.value,
+            value: meta.value,
+            checked: false // permite seleção para deletar independente do estado atual do checked
+        }))
+    })
+
+    if (itensParaDeletar.length === 0) {
+        console.log("Nenhum item foi deletado")
+        return
+    }
+
+    // removendo as metas selecionadas para deletar
+    metas = metas.filter(meta => !itensParaDeletar.includes(meta.value))
+
+    console.log("meta(s) deletada(s) com sucesso!")
+}
+
 const start = async () => {
     while (true) {
         const opcao = await select({
@@ -71,6 +108,14 @@ const start = async () => {
                     value: "concluídas" 
                 },
                 { 
+                    name: "metas em andamento", 
+                    value: "andamento" 
+                },
+                { 
+                    name: "deletar metas", 
+                    value: "deletar" 
+                },
+                { 
                     name: "sair", 
                     value: "sair" 
                 }
@@ -87,6 +132,12 @@ const start = async () => {
                 break
             case "concluídas":
                 await metasConcluidas()
+                break
+            case "andamento":
+                await metasAndamento()
+                break
+            case "deletar":
+                await metasDeletadas()
                 break
             case "sair":
                 console.log("até a próxima!")
